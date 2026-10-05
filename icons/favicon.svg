@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <title>BF Tracker</title>
+  <!-- 24% corner radius -->
+  <rect width="512" height="512" rx="123" fill="#007AFF"/>
+
+  <!-- BF only (ECG omitted: illegible at 32px); heavier stroke for small sizes -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round" stroke-linejoin="round" transform="translate(-21 61)">
+    <path d="M168 120V270 M168 120H198A37.5 37.5 0 0 1 198 195H168 M168 195H206A37.5 37.5 0 0 1 206 270H168"/>
+    <path d="M330 120V270 M330 120H390 M330 195H378"/>
+  </g>
+</svg>

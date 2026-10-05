@@ -1,0 +1,330 @@
+/* iOS Health–style palette */
+:root {
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --text: #1c1c1e;
+  --text-2: #3a3a3c;
+  --muted: #8e8e93;
+  --separator: #e5e5ea;
+  --field: #f2f2f7;
+  --blue: #007aff;
+  --blue-press: #0062cc;
+  --green: #34c759;
+  --orange: #ff9500;
+  --red: #ff3b30;
+  --radius: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Safe areas: notch / home indicator when launched from the home screen. */
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+}
+
+/* Header / hero number */
+.header {
+  text-align: center;
+  margin: 0.5rem 0 1.25rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bf-display {
+  margin-top: 0.5rem;
+}
+
+.bf-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.bf-value {
+  display: block;
+  font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+}
+
+.bf-category {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bf-category.essential,
+.bf-category.athletic {
+  background: #e5f1ff;
+  color: #0062cc;
+}
+
+.bf-category.fit {
+  background: #e3f7e8;
+  color: #248a3d;
+}
+
+.bf-category.average {
+  background: #fff2e0;
+  color: #c93400;
+}
+
+.bf-category.high {
+  background: #ffe5e3;
+  color: #d70015;
+}
+
+.bf-delta {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.bf-delta.down {
+  color: #248a3d;
+}
+
+.bf-delta.up {
+  color: var(--red);
+}
+
+.bf-warning {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #c93400;
+}
+
+/* Cards */
+.section {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.9rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.section h2,
+.section > details > summary {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Collapsibles: chevron instead of the default triangle */
+details summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::after {
+  content: "›";
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+details[open] > summary::after {
+  transform: rotate(90deg);
+}
+
+.section > details:not([open]) > summary {
+  margin-bottom: 0;
+}
+
+/* Fields */
+label {
+  display: block;
+  margin-bottom: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+/* ≥16px stops iOS Safari zooming on focus; 44px tap targets. */
+input,
+select,
+button {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.3rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.0625rem;
+  font-variant-numeric: tabular-nums;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+button {
+  cursor: pointer;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+}
+
+button:hover {
+  background: var(--blue-press);
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+.hint {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.howto {
+  margin-top: 0.25rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--separator);
+}
+
+.section .howto > summary {
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--blue);
+}
+
+.howto ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+.howto li + li {
+  margin-top: 0.3rem;
+}
+
+.height-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.height-row label {
+  flex: 1;
+}
+
+/* Chart */
+.trend-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-empty {
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+/* History */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+th,
+td {
+  padding: 0.5rem 0.3rem;
+  border-bottom: 1px solid var(--separator);
+  text-align: left;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Delete: quiet red text, still a 44px target */
+td button {
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 0.25rem;
+  background: none;
+  color: var(--red);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+td button:hover {
+  background: none;
+  opacity: 0.7;
+}

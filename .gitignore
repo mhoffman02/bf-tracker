@@ -1,0 +1,21 @@
+# deps / tooling
+node_modules/
+coverage/
+*.log
+
+# env / secrets
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# scratch
+*.tmp
+*.bak

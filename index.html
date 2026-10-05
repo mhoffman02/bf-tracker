@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BF Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f2f2f7" />
+
+  <!-- PWA / Apple -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <h1>BF Tracker</h1>
+      <div class="bf-display">
+        <span class="bf-label">Composite BF%</span>
+        <span id="bfCompValue" class="bf-value">—</span>
+        <span id="bfCategory" class="bf-category" hidden></span>
+        <span id="bfDelta" class="bf-delta" hidden></span>
+        <span id="bfWarning" class="bf-warning" hidden></span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Weekly measurements</h2>
+      <form id="measureForm" autocomplete="off">
+        <label>
+          Date
+          <input type="date" id="dateInput" />
+        </label>
+
+        <label>
+          Waist (<span data-unit="len">in</span>)
+          <input type="number" id="waistInput" step="0.1" inputmode="decimal" />
+          <small class="hint" id="waistHint"><span data-sex="male">At the navel</span><span data-sex="female" hidden>Narrowest point between ribs and hips</span> · relaxed, after a normal breath out</small>
+        </label>
+
+        <label>
+          Weight (<span data-unit="mass">lb</span>)
+          <input type="number" id="weightInput" step="0.1" inputmode="decimal" />
+          <small class="hint">Morning, after the bathroom, before eating</small>
+        </label>
+      </form>
+
+      <details class="howto">
+        <summary>How to measure</summary>
+        <ul>
+          <li>Bare skin, standing tall, shoulders relaxed, eyes straight ahead.</li>
+          <li>Tape level all the way around — check in a mirror.</li>
+          <li>Snug, not denting: touching skin all round without pressing in. Don’t suck in or flare your neck.</li>
+          <li>A spring‑tension tape (MyoTape, Gulick) gives the same tension every time.</li>
+          <li>Measure twice. If they differ by more than ¼ in (0.5 cm), take a third and average.</li>
+          <li>Same conditions every week: same day, morning, after the bathroom, before food, drink or exercise.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="section">
+      <details>
+        <summary>More / Settings</summary>
+
+        <form id="settingsForm" autocomplete="off">
+          <label>
+            Sex
+            <select id="sexInput">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </label>
+
+          <label>
+            Units
+            <select id="unitToggle">
+              <option value="us">US (lb, in)</option>
+              <option value="metric">Metric (kg, cm)</option>
+            </select>
+          </label>
+
+          <label>
+            Neck (<span data-unit="len">in</span>)
+            <input type="number" id="neckInput" step="0.1" inputmode="decimal" />
+            <small class="hint" id="neckHint">Just below the Adam’s apple · tape slopes slightly down at the front</small>
+          </label>
+
+          <label id="hipField" hidden>
+            Hip (<span data-unit="len">in</span>)
+            <input type="number" id="hipInput" step="0.1" inputmode="decimal" />
+            <small class="hint">Widest part of the buttocks · feet together</small>
+          </label>
+
+          <div class="height-row" id="heightUsRow">
+            <label>
+              Height (ft)
+              <input type="number" id="heightFtInput" step="1" inputmode="numeric" />
+            </label>
+            <label>
+              Height (in)
+              <input type="number" id="heightInInput" step="0.5" inputmode="decimal" />
+            </label>
+          </div>
+
+          <label id="heightCmField" hidden>
+            Height (cm)
+            <input type="number" id="heightCmInput" step="0.5" inputmode="decimal" />
+          </label>
+
+          <label>
+            Age (years)
+            <input type="number" id="ageInput" step="1" inputmode="numeric" />
+          </label>
+        </form>
+      </details>
+    </section>
+
+    <section class="section">
+      <h2>Trend</h2>
+      <svg id="trendChart" class="trend-chart" viewBox="0 0 320 200" role="img" aria-label="Composite BF% trend"></svg>
+    </section>
+
+    <section class="section">
+      <details>
+        <summary>History</summary>
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>BF%</th>
+              <th>Waist (<span data-unit="len">in</span>)</th>
+              <th>Weight (<span data-unit="mass">lb</span>)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </details>
+    </section>
+
+    <section class="section">
+      <details>
+        <summary>Export</summary>
+        <button id="exportCsvBtn">Download CSV</button>
+      </details>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

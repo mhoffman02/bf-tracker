@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <title>BF Tracker</title>
+  <!-- Full-bleed background; OS applies corner mask -->
+  <rect width="512" height="512" fill="#007AFF"/>
+
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" transform="translate(-13 15)">
+    <!-- B -->
+    <path d="M168 120V270 M168 120H198A37.5 37.5 0 0 1 198 195H168 M168 195H206A37.5 37.5 0 0 1 206 270H168" stroke-width="36"/>
+    <!-- F -->
+    <path d="M310 120V270 M310 120H370 M310 195H358" stroke-width="36"/>
+  </g>
+
+  <!-- ECG heartline, centered on x=256 -->
+  <polyline points="146,360 228,360 238,371 256,327 274,387 288,360 366,360"
+            fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
