@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { CM_PER_IN, KG_PER_LB, navyBF, bmi, compositeBF, compute, weightedMA, bfCategory } from "../calc.js";
+import { CM_PER_IN, KG_PER_LB, navyBF, bmi, compositeBF, compute, weightedMA, bfCategory, massSplit } from "../calc.js";
 
 const near = (a, b, eps = 0.05) => assert.ok(Math.abs(a - b) < eps, `${a} ≉ ${b}`);
 
@@ -64,4 +64,10 @@ test("BF% category uses sex-specific ACE ranges", () => {
   assert.equal(bfCategory(24, "female").key, "fit");
   assert.equal(bfCategory(31, "female").key, "average");
   assert.equal(bfCategory(32, "female").key, "high");
+});
+
+test("fat / lean mass split from weight and BF%", () => {
+  const { fatKg, leanKg } = massSplit(90, 25);
+  assert.equal(fatKg, 22.5);
+  assert.equal(leanKg, 67.5);
 });

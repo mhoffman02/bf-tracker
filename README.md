@@ -1,13 +1,13 @@
-# BF Tracker
+# Body Comp
 
-Minimal, installable body-fat tracker PWA. Static files, no backend, data in `localStorage`.
+**Body fat, waist & weight tracker.** Minimal, installable PWA: composite body-fat % (Navy tape method + BMI/age), fat and lean mass, weekly trend. Static files, no backend, data in `localStorage`.
 See [REQUIREMENTS.md](REQUIREMENTS.md).
 
 Live: https://mhoffman02.github.io/bf-tracker/
 
 ## Privacy
 
-**Data Not Collected.** BF Tracker has no account, no analytics, no ads and no tracking. Your measurements are stored only in your browser on this device (`localStorage`) and are never sent to a server. The app makes no network requests while in use (enforced by a test); after the first visit it runs fully offline.
+**Data Not Collected.** Body Comp has no account, no analytics, no ads and no tracking. Your measurements are stored only in your browser on this device (`localStorage`) and are never sent to a server. The app makes no network requests while in use (enforced by a test); after the first visit it runs fully offline.
 
 - **Data shared with third parties:** none.
 - **Hosting:** the app's files are served by GitHub Pages, which, like any web host, may log standard request data (e.g. IP address) when the files are downloaded. No measurements are included.

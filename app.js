@@ -1,4 +1,4 @@
-import { CM_PER_IN, KG_PER_LB, compute, weightedMA, bfCategory } from "./calc.js";
+import { CM_PER_IN, KG_PER_LB, compute, weightedMA, bfCategory, massSplit } from "./calc.js";
 import { toCSV, parseCSV } from "./csv.js";
 
 const ENTRIES_KEY = "bf.entries";
@@ -40,6 +40,7 @@ const $ = (id) => document.getElementById(id);
 const bfCompEl = $("bfCompValue");
 const bfWarningEl = $("bfWarning");
 const bfDeltaEl = $("bfDelta");
+const massSplitEl = $("massSplit");
 const bfCategoryEl = $("bfCategory");
 const dateInput = $("dateInput");
 const waistInput = $("waistInput");
@@ -265,6 +266,14 @@ function update() {
   bfCompEl.textContent = result ? `${result.bfComp.toFixed(1)}%` : "—";
   bfWarningEl.textContent = result?.warning ?? "";
   bfWarningEl.hidden = !result?.warning;
+
+  massSplitEl.hidden = !result;
+  if (result) {
+    const { fatKg, leanKg } = massSplit(m.weightKg, result.bfComp);
+    const unit = isUS() ? "lb" : "kg";
+    const fixed1 = (kg) => Number(massOut(kg)).toFixed(1);
+    massSplitEl.textContent = `Fat ${fixed1(fatKg)} ${unit} · Lean ${fixed1(leanKg)} ${unit}`;
+  }
 
   const category = result && bfCategory(result.bfComp, m.sex);
   bfCategoryEl.hidden = !category;
@@ -554,7 +563,7 @@ function onExportCsv() {
   const url = URL.createObjectURL(new Blob([toCSV(entries)], { type: "text/csv" }));
   const a = document.createElement("a");
   a.href = url;
-  a.download = `bf-tracker-${today()}.csv`;
+  a.download = `body-comp-${today()}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

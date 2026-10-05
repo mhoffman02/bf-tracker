@@ -207,3 +207,24 @@ test("chart: switch metric to waist / weight; choice persists", async () => {
   assert.equal(again.window.document.querySelector('[data-metric="weight"]').getAttribute("aria-pressed"), "true");
   again.close();
 });
+
+test("rebrand: Body Comp name; header shows fat and lean mass in display units", async () => {
+  const { readFileSync } = await import("node:fs");
+  const manifest = JSON.parse(readFileSync(new URL("../manifest.json", import.meta.url), "utf8"));
+  assert.equal(manifest.name, "Body Comp");
+  assert.equal(manifest.short_name, "Body Comp");
+
+  const app = await loadApp();
+  assert.equal(app.window.document.title, "Body Comp");
+  const split = () => app.$("massSplit").textContent;
+  const m = split().match(/^Fat ([\d.]+) lb · Lean ([\d.]+) lb$/);
+  assert.ok(m, split());
+  assert.ok(Math.abs(Number(m[1]) + Number(m[2]) - 200) < 0.15, "fat + lean = weight");
+
+  app.select("unitToggle", "metric");
+  assert.match(split(), /^Fat [\d.]+ kg · Lean [\d.]+ kg$/);
+
+  app.type("weightInput", "");
+  assert.equal(app.$("massSplit").hidden, true);
+  app.close();
+});

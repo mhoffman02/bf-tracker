@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "BF Tracker",
-  "short_name": "BF Tracker",
-  "description": "Weekly body-fat tracker: Navy tape method + BMI/age composite, offline.",
+  "name": "Body Comp",
+  "short_name": "Body Comp",
+  "description": "Body fat, waist & weight tracker. Navy tape method + BMI/age composite, with fat and lean mass. Works offline; data stays on your device.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f2f2f7",
@@ -39,14 +39,14 @@
       "sizes": "1000x2000",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Composite BF%, weekly entry, and trend"
+      "label": "Body fat %, fat and lean mass, weekly entry, and trend"
     },
     {
       "src": "screenshots/wide.png",
       "sizes": "1280x800",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "BF Tracker on desktop"
+      "label": "Body Comp on desktop"
     }
   ]
 }

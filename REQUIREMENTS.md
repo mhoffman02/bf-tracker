@@ -1,6 +1,8 @@
-# BF Tracker — Requirements
+# Body Comp — Requirements
 
-Single‑page PWA for tracking weekly body‑fat percentage.
+Single‑page PWA for tracking weekly body composition: body‑fat %, fat and lean mass, waist and weight.
+
+**Branding:** name and home‑screen label “Body Comp”; subtitle “Body fat, waist & weight tracker” (keeps the searched‑for term). Icon stays “BF”. Repo/URL stay `bf-tracker` (installed apps were added from it); storage keys unchanged.
 
 ## 1. Purpose
 
@@ -16,6 +18,7 @@ A minimal, installable single‑page web app (iPhone, iPad, desktop) that tracks
 - Recalculates live as the user types.
 - Shown to 1 decimal place (e.g. `22.4%`).
 - Shows `—` when inputs are incomplete or invalid.
+- Fat / lean mass line: `Fat 51.2 lb · Lean 143.4 lb` — fat = weight × BF%, lean (fat‑free) = weight − fat; display units; hidden when `—`.
 - Range pill under the number (American Council on Exercise ranges, by sex):
 
   | Label     | Male    | Female  |

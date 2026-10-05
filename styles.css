@@ -104,6 +104,15 @@ body {
   color: #d70015;
 }
 
+.mass-split {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
 .bf-delta {
   display: block;
   margin-top: 0.35rem;

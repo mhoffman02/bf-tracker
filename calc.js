@@ -80,3 +80,9 @@ export function bfCategory(bf, sex) {
   const [key, label] = LABELS[i === -1 ? LABELS.length - 1 : i];
   return { key, label };
 }
+
+// Fat mass = weight × BF%; lean (fat-free) mass = the rest. Same unit as weight.
+export function massSplit(weight, bfPercent) {
+  const fatKg = (weight * bfPercent) / 100;
+  return { fatKg, leanKg: weight - fatKg };
+}
