@@ -203,6 +203,21 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+/* iOS Safari gives date inputs an intrinsic min-width that ignores width:100%,
+   overflowing the card; drop native appearance and allow shrinking. */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
 input:focus,
 select:focus {
   outline: none;
@@ -269,6 +284,7 @@ button:active {
 
 .height-row label {
   flex: 1;
+  min-width: 0;
 }
 
 /* Chart */
