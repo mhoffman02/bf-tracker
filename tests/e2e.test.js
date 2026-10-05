@@ -276,3 +276,20 @@ test("date is never left empty (iOS picker Reset, page restore, after import)", 
   assert.equal(date.value, today, "after restore → today");
   app.close();
 });
+
+test("restoring yesterday's backup today: keeps today's date, saves nothing new", async () => {
+  const app = await loadApp();
+  const today = app.$("dateInput").value;
+  const [y, m, d] = today.split("-").map(Number);
+  const dt = new Date(y, m - 1, d - 1);
+  const yesterday = [dt.getFullYear(), dt.getMonth() + 1, dt.getDate()].map((n) => String(n).padStart(2, "0")).join("-");
+
+  await pickFile(app, `date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n${yesterday},male,96,40,,175,88,40\n`);
+  app.leave(); // flush anything pending
+
+  assert.equal(app.$("dateInput").value, today, "date stays today");
+  assert.deepEqual(app.entries().map((e) => e.date), [yesterday], "only yesterday's entry; nothing written for today");
+  assert.equal(app.$("waistInput").value, String(Math.round((96 / 2.54) * 10) / 10), "fields prefilled from the latest entry");
+  assert.match(app.$("bfDelta").textContent, /^No change since /);
+  app.close();
+});
