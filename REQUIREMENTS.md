@@ -216,4 +216,4 @@ Applied identically for both sexes (assumption — see §11).
 ## 11. Open questions
 
 - Should the composite adjustments (§3.3) differ for females?
-- Confirm first‑run defaults (§5) — values are approximations.
+- First‑run defaults (§5): male confirmed (2026‑10‑04); female values still approximations.
