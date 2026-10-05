@@ -73,7 +73,7 @@ Values persist and are reused for every entry. Each saved entry stores a snapsho
 
 - **Download CSV** of all entries, generated client‑side.
 - Columns: `date, sex, waist_cm, neck_cm, hip_cm, height_cm, weight_kg, age, bmi, bf_navy, bf_composite`.
-- **Restore from CSV**: reads that format back (columns matched by name; `YYYY-MM-DD` or US `M/D/YYYY` dates). BMI/BF% are recomputed; invalid rows are skipped. Merges by date — an imported date replaces the existing one (confirm first). On a fresh install the profile (sex, neck, hip, height, age) is restored from the latest entry. Shows “Imported N entries (R replaced), S skipped.”
+- **Restore from CSV**: reads that format back (columns matched by name; `YYYY-MM-DD` or US `M/D/YYYY` dates). BMI/BF% are recomputed; invalid rows are skipped. Merges by date — an imported date replaces the existing one (confirm first). If the newest entry overall comes from the file (fresh install, or a backup newer than local data), the profile (sex, neck, hip, height, age) and weekly fields are restored from it; otherwise the current profile is kept. Shows “Imported N entries (R replaced), S skipped.”
 
 ## 3. Formulas
 

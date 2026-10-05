@@ -585,14 +585,14 @@ async function onImportFile() {
   const replaced = [...incoming.keys()].filter((d) => byDate.has(d)).length;
   if (replaced && !confirm(`Restore ${incoming.size} entries? ${replaced} existing date(s) will be replaced.`)) return;
 
-  const wasEmpty = entries.length === 0;
   for (const [date, e] of incoming) byDate.set(date, e);
   entries = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
   saveEntries();
 
-  // Fresh install: also restore the profile and weekly fields from the latest entry.
-  if (wasEmpty) {
-    const last = entries[entries.length - 1];
+  // If the newest entry overall came from the file (fresh install, or a backup newer
+  // than what's here), adopt its profile and weekly values; otherwise keep the current ones.
+  const last = entries[entries.length - 1];
+  if (incoming.get(last.date) === last) {
     Object.assign(settings, { sex: last.sex, neckCm: last.neckCm, heightCm: last.heightCm, age: last.age });
     if (last.hipCm) settings.hipCm = last.hipCm;
     saveSettings();

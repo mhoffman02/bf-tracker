@@ -1,5 +1,5 @@
 // Bump on each release so installed clients pick up new files.
-const VERSION = "v6";
+const VERSION = "v7";
 const CACHE = `bf-tracker-${VERSION}`;
 
 const PRECACHE = [

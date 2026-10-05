@@ -152,8 +152,10 @@ const pickFile = async (app, text) => {
   const input = app.$("importInput");
   const file = new w.File([text], "backup.csv", { type: "text/csv" });
   Object.defineProperty(input, "files", { value: [file], configurable: true });
+  app.$("backupStatus").textContent = "";
   input.dispatchEvent(new w.Event("change"));
-  await sleep(20); // file is read asynchronously
+  // The file is read asynchronously; wait for the result message.
+  for (let i = 0; i < 100 && !app.$("backupStatus").textContent; i++) await sleep(10);
 };
 
 test("restore from CSV: merges by date, replaces same date, reports result", async () => {
@@ -226,5 +228,32 @@ test("rebrand: Body Comp name; header shows fat and lean mass in display units",
 
   app.type("weightInput", "");
   assert.equal(app.$("massSplit").hidden, true);
+  app.close();
+});
+
+test("restore onto an app with older entries adopts the newer imported profile", async () => {
+  const app = await loadApp({ "bf.entries": JSON.stringify([prior("2026-09-01", 26)]) });
+  const csv =
+    "date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n" +
+    "2026-09-27,male,93.98,41.91,,185.42,83.91,61\n";
+  await pickFile(app, csv);
+
+  assert.equal(app.$("neckInput").value, "16.5");
+  assert.equal(app.$("heightFtInput").value, "6");
+  assert.equal(app.$("heightInInput").value, "1");
+  assert.equal(app.$("ageInput").value, "61");
+  assert.equal(JSON.parse(app.window.localStorage.getItem("bf.settings")).age, 61);
+  app.close();
+});
+
+test("restoring only older entries keeps the current profile", async () => {
+  const app = await loadApp({ "bf.entries": JSON.stringify([prior("2026-10-01", 26)]) });
+  const csv =
+    "date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n" +
+    "2026-09-01,male,93.98,41.91,,185.42,83.91,61\n";
+  await pickFile(app, csv);
+
+  assert.equal(app.$("ageInput").value, "40");
+  assert.equal(app.entries().length, 2);
   app.close();
 });
