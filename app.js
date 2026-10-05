@@ -98,6 +98,10 @@ function init() {
     if (document.visibilityState === "hidden") flushSave();
   });
   window.addEventListener("pagehide", flushSave);
+  window.addEventListener("pageshow", () => {
+    ensureDate();
+    update();
+  });
 }
 
 // storage
@@ -297,7 +301,14 @@ function onWeeklyInput() {
   scheduleSave();
 }
 
+// iOS can leave the date empty (picker "Reset", form restore after a reload);
+// without a date nothing can be saved, so fall back to today.
+function ensureDate() {
+  if (!dateInput.value) dateInput.value = today();
+}
+
 function onDateChange() {
+  ensureDate();
   const existing = entries.find((e) => e.date === dateInput.value);
   if (existing) writeWeeklyFields(existing.waistCm, existing.weightKg);
   update();
@@ -601,6 +612,7 @@ async function onImportFile() {
     applySexUI();
   }
 
+  ensureDate();
   renderHistory();
   renderChart();
   update();

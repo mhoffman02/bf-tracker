@@ -257,3 +257,22 @@ test("restoring only older entries keeps the current profile", async () => {
   assert.equal(app.entries().length, 2);
   app.close();
 });
+
+test("date is never left empty (iOS picker Reset, page restore, after import)", async () => {
+  const app = await loadApp();
+  const date = app.$("dateInput");
+  const today = date.value;
+
+  date.value = "";
+  date.dispatchEvent(new app.window.Event("change"));
+  assert.equal(date.value, today, "cleared via picker → back to today");
+
+  date.value = "";
+  app.window.dispatchEvent(new app.window.Event("pageshow"));
+  assert.equal(date.value, today, "page restored with empty date → today");
+
+  date.value = "";
+  await pickFile(app, "date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n2026-09-27,male,96,40,,175,88,40\n");
+  assert.equal(date.value, today, "after restore → today");
+  app.close();
+});

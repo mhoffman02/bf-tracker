@@ -37,6 +37,12 @@ export async function loadApp(storage = {}) {
     // Flushes the debounced auto-save, as closing the app would.
     leave: () => w.dispatchEvent(new w.Event("pagehide")),
     dump: () => ({ ...w.localStorage }),
-    close: () => w.close(),
+    // Flush any pending debounced save first: app timers are Node timers and
+    // storage is reached via shared globals, so a late save could otherwise
+    // write into the next test's app.
+    close() {
+      w.dispatchEvent(new w.Event("pagehide"));
+      w.close();
+    },
   };
 }
