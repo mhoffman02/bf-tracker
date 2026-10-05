@@ -42,6 +42,8 @@ On each release, bump `VERSION` in `service-worker.js` so installed clients pick
 Open the live URL in Safari → Share → **Add to Home Screen**.
 Note: home-screen app storage is separate from Safari-tab storage, and devices don't sync — use CSV export as backup.
 
+**Install it — don't just bookmark it.** Safari may delete a website's stored data after 7 days of Safari use without visiting the site. Apps added to the Home Screen are exempt, so your entries are kept.
+
 ## License
 
 [MIT](LICENSE)
