@@ -428,7 +428,7 @@ function renderChart() {
   for (let v = yMin; v <= yMax; v += step) {
     chartSvg.appendChild(svg("line", { x1: pad.l, x2: W - pad.r, y1: y(v), y2: y(v), stroke: "#e5e5ea", "stroke-dasharray": "2 3" }));
     chartSvg.appendChild(
-      svg("text", { x: pad.l - 4, y: y(v) + 3, "text-anchor": "end", "font-size": 9, fill: "#8e8e93" }, `${v}%`)
+      svg("text", { x: pad.l - 4, y: y(v) + 3, "text-anchor": "end", "font-size": 9, fill: "#6c6c70" }, `${v}%`)
     );
   }
 
@@ -436,7 +436,7 @@ function renderChart() {
   const xLabel = (i, anchor) =>
     svg(
       "text",
-      { x: x(t[i]), y: H - 6, "text-anchor": anchor, "font-size": 9, fill: "#8e8e93" },
+      { x: x(t[i]), y: H - 6, "text-anchor": anchor, "font-size": 9, fill: "#6c6c70" },
       formatDate(entries[i].date, { month: "short", day: "numeric" })
     );
   chartSvg.appendChild(xLabel(0, "start"));
@@ -566,5 +566,13 @@ init();
 const isDev = ["localhost", "127.0.0.1"].includes(location.hostname) && !location.search.includes("sw");
 if ("serviceWorker" in navigator) {
   if (isDev) navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
-  else navigator.serviceWorker.register("service-worker.js");
+  else {
+    // When an update activates, reload once so the new files show immediately
+    // (skipped on first install, when there was no previous controller).
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hadController) location.reload();
+    });
+    navigator.serviceWorker.register("service-worker.js");
+  }
 }

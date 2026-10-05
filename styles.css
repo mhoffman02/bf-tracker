@@ -4,11 +4,12 @@
   --card: #ffffff;
   --text: #1c1c1e;
   --text-2: #3a3a3c;
-  --muted: #8e8e93;
+  --muted: #6c6c70; /* ≥ 4.5:1 on --bg and white (WCAG AA) */
   --separator: #e5e5ea;
   --field: #f2f2f7;
   --blue: #007aff;
   --blue-press: #0062cc;
+  --blue-text: #0062cc; /* #007aff is < 4.5:1 for small text */
   --green: #34c759;
   --orange: #ff9500;
   --red: #ff3b30;
@@ -262,7 +263,7 @@ button:active {
   letter-spacing: 0;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--blue);
+  color: var(--blue-text);
 }
 
 .howto ul {

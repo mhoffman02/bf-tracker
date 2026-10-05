@@ -1,5 +1,5 @@
 // Bump on each release so installed clients pick up new files.
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = `bf-tracker-${VERSION}`;
 
 const PRECACHE = [
@@ -21,7 +21,9 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(PRECACHE))
+      // cache: "reload" bypasses the HTTP cache (GitHub Pages: max-age=600),
+      // otherwise a new version can be filled with stale files.
+      .then((cache) => cache.addAll(PRECACHE.map((url) => new Request(url, { cache: "reload" }))))
       .then(() => self.skipWaiting())
   );
 });
