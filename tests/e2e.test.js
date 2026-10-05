@@ -146,3 +146,64 @@ test("privacy: notice shown; using the app makes no network requests", async () 
     globalThis.fetch = realFetch;
   }
 });
+
+const pickFile = async (app, text) => {
+  const w = app.window;
+  const input = app.$("importInput");
+  const file = new w.File([text], "backup.csv", { type: "text/csv" });
+  Object.defineProperty(input, "files", { value: [file], configurable: true });
+  input.dispatchEvent(new w.Event("change"));
+  await sleep(20); // file is read asynchronously
+};
+
+test("restore from CSV: merges by date, replaces same date, reports result", async () => {
+  const app = await loadApp({ "bf.entries": JSON.stringify([prior("2026-09-27", 40)]) });
+  const csv =
+    "date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n" +
+    "2026-09-20,male,100,39.37,,175.26,90,40\n" +
+    "2026-09-27,male,99,39.37,,175.26,89,40\n" +
+    "not-a-date,male,99,39.37,,175.26,89,40\n";
+  await pickFile(app, csv);
+
+  const dates = app.entries().map((e) => e.date);
+  assert.deepEqual(dates, ["2026-09-20", "2026-09-27"]);
+  assert.notEqual(app.entries()[1].bfComp, 40, "same date replaced by imported row");
+  assert.match(app.$("backupStatus").textContent, /Imported 2 .*1 skipped/);
+  assert.equal(app.historyRows(), 2);
+  app.close();
+});
+
+test("restore on a fresh install also restores the profile", async () => {
+  const app = await loadApp();
+  const csv =
+    "date,sex,waist_cm,neck_cm,hip_cm,height_cm,weight_kg,age\n" +
+    "2026-09-27,female,80,33,100,165,70,35\n";
+  await pickFile(app, csv);
+
+  assert.equal(app.$("sexInput").value, "female");
+  assert.equal(app.$("hipField").hidden, false);
+  assert.equal(app.$("ageInput").value, "35");
+  assert.equal(JSON.parse(app.window.localStorage.getItem("bf.settings")).sex, "female");
+  app.close();
+});
+
+test("chart: switch metric to waist / weight; choice persists", async () => {
+  const seed = [prior("2026-09-13", 27), prior("2026-09-20", 26.5), prior("2026-09-27", 26)];
+  const app = await loadApp({ "bf.entries": JSON.stringify(seed) });
+  const chart = app.$("trendChart");
+  const tab = (m) => app.window.document.querySelector(`[data-metric="${m}"]`);
+
+  assert.equal(tab("bf").getAttribute("aria-pressed"), "true");
+  tab("waist").dispatchEvent(new app.window.Event("click"));
+  assert.equal(tab("waist").getAttribute("aria-pressed"), "true");
+  assert.match(chart.getAttribute("aria-label"), /Waist/);
+  assert.ok(chart.textContent.includes("40.0 in"), "latest waist labelled in display units");
+
+  tab("weight").dispatchEvent(new app.window.Event("click"));
+  assert.ok(chart.textContent.includes("200.0 lb"));
+  app.close();
+
+  const again = await loadApp(app.dump());
+  assert.equal(again.window.document.querySelector('[data-metric="weight"]').getAttribute("aria-pressed"), "true");
+  again.close();
+});

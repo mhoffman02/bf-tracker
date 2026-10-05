@@ -54,7 +54,7 @@ Values persist and are reused for every entry. Each saved entry stores a snapsho
 
 ### 2.4 Trend chart (always visible)
 
-- Line chart of composite BF% over time (x = date, y = BF%).
+- Line chart over time (x = date). Segmented switch above it: **BF% | Waist | Weight** (one metric at a time, in current display units; choice is remembered). Default BF%.
 - Overlay: 3‑point weighted moving average, weights **1 : 2 : 3** (oldest → newest):
   `MA_i = (BF_{i-2} + 2·BF_{i-1} + 3·BF_i) / 6`, starting from the 3rd entry.
 - Rendered as hand‑written inline SVG; no chart library or CDN.
@@ -66,10 +66,11 @@ Values persist and are reused for every entry. Each saved entry stores a snapsho
 - Per‑row delete (with confirm).
 - No inline editing; re‑entering a date overwrites that entry (see §5).
 
-### 2.6 Export (collapsed)
+### 2.6 Backup (collapsed)
 
-- CSV download of all entries, generated client‑side.
+- **Download CSV** of all entries, generated client‑side.
 - Columns: `date, sex, waist_cm, neck_cm, hip_cm, height_cm, weight_kg, age, bmi, bf_navy, bf_composite`.
+- **Restore from CSV**: reads that format back (columns matched by name; `YYYY-MM-DD` or US `M/D/YYYY` dates). BMI/BF% are recomputed; invalid rows are skipped. Merges by date — an imported date replaces the existing one (confirm first). On a fresh install the profile (sex, neck, hip, height, age) is restored from the latest entry. Shows “Imported N entries (R replaced), S skipped.”
 
 ## 3. Formulas
 
@@ -210,10 +211,8 @@ Applied identically for both sexes (assumption — see §11).
 
 ## 10. Nice‑to‑have
 
-- CSV import (restores an export; enables manual cross‑device transfer).
-- Chart overlays for waist and weight.
+- _(none open — CSV import and waist/weight chart shipped 2026‑10‑04)_
 
 ## 11. Open questions
 
-- Should the composite adjustments (§3.3) differ for females?
 - First‑run defaults (§5): male confirmed (2026‑10‑04); female values still approximations.

@@ -302,6 +302,73 @@ button:active {
   fill: var(--muted);
 }
 
+/* Chart metric switch (iOS segmented control) */
+.chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.chart-head h2 {
+  margin: 0;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--field);
+}
+
+.segmented button {
+  width: auto;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 0.7rem;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.segmented button:hover {
+  background: none;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Backup */
+.backup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.backup-actions button {
+  margin: 0;
+}
+
+button.secondary {
+  background: var(--field);
+  color: var(--blue-text);
+}
+
+button.secondary:hover {
+  background: var(--separator);
+}
+
+#backupStatus:empty {
+  display: none;
+}
+
 /* Privacy footer */
 .privacy {
   margin: 1.5rem 1rem 0.5rem;

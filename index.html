@@ -123,7 +123,14 @@
     </section>
 
     <section class="section">
-      <h2>Trend</h2>
+      <div class="chart-head">
+        <h2>Trend</h2>
+        <div class="segmented" role="group" aria-label="Chart metric">
+          <button type="button" data-metric="bf" aria-pressed="true">BF%</button>
+          <button type="button" data-metric="waist" aria-pressed="false">Waist</button>
+          <button type="button" data-metric="weight" aria-pressed="false">Weight</button>
+        </div>
+      </div>
       <svg id="trendChart" class="trend-chart" viewBox="0 0 320 200" role="img" aria-label="Composite BF% trend"></svg>
     </section>
 
@@ -147,8 +154,13 @@
 
     <section class="section">
       <details>
-        <summary>Export</summary>
-        <button id="exportCsvBtn">Download CSV</button>
+        <summary>Backup</summary>
+        <div class="backup-actions">
+          <button type="button" id="exportCsvBtn">Download CSV</button>
+          <button type="button" id="importCsvBtn" class="secondary">Restore from CSV</button>
+        </div>
+        <input type="file" id="importInput" accept=".csv,text/csv" hidden />
+        <p class="hint" id="backupStatus" role="status"></p>
       </details>
     </section>
 

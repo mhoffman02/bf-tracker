@@ -1,4 +1,5 @@
 import { CM_PER_IN, KG_PER_LB, compute, weightedMA, bfCategory } from "./calc.js";
+import { toCSV, parseCSV } from "./csv.js";
 
 const ENTRIES_KEY = "bf.entries";
 const SETTINGS_KEY = "bf.settings";
@@ -56,6 +57,11 @@ const heightCmInput = $("heightCmInput");
 const ageInput = $("ageInput");
 const historyTableBody = document.querySelector("#historyTable tbody");
 const exportCsvBtn = $("exportCsvBtn");
+const importCsvBtn = $("importCsvBtn");
+const importInput = $("importInput");
+const backupStatus = $("backupStatus");
+/** @type {HTMLElement[]} */
+const metricButtons = [...document.querySelectorAll("[data-metric]")].map((el) => /** @type {HTMLElement} */ (el));
 const chartSvg = $("trendChart");
 
 function init() {
@@ -82,6 +88,9 @@ function init() {
   sexInput.addEventListener("change", onSexChange);
   unitToggle.addEventListener("change", onUnitChange);
   exportCsvBtn.addEventListener("click", onExportCsv);
+  importCsvBtn.addEventListener("click", () => importInput.click());
+  importInput.addEventListener("change", onImportFile);
+  for (const btn of metricButtons) btn.addEventListener("click", onMetricClick);
 
   // Don't lose a pending debounced save when the app is backgrounded/closed.
   document.addEventListener("visibilitychange", () => {
@@ -324,6 +333,7 @@ function onUnitChange() {
   applyUnitsUI();
   update();
   renderHistory();
+  renderChart();
 }
 
 // auto-save (§5): debounced, valid entries only
@@ -362,7 +372,8 @@ function renderHistory() {
   for (const e of [...entries].reverse()) {
     const tr = document.createElement("tr");
     const date = formatDate(e.date, { dateStyle: "medium" });
-    for (const text of [date, e.bfComp.toFixed(1), lenOut(e.waistCm), massOut(e.weightKg)]) {
+    const fixed1 = (v) => Number(v).toFixed(1);
+    for (const text of [date, e.bfComp.toFixed(1), fixed1(lenOut(e.waistCm)), fixed1(massOut(e.weightKg))]) {
       const td = document.createElement("td");
       td.textContent = text;
       tr.appendChild(td);
@@ -396,9 +407,46 @@ function svg(tag, attrs, text) {
   return el;
 }
 
+// Chart metrics; values in current display units.
+const METRICS = {
+  bf: {
+    label: "BF%",
+    color: "#007aff",
+    value: (e) => e.bfComp,
+    tick: (v) => `${v}%`,
+    format: (v) => `${v.toFixed(1)}%`,
+  },
+  waist: {
+    label: "Waist",
+    color: "#248a3d",
+    value: (e) => (isUS() ? e.waistCm / CM_PER_IN : e.waistCm),
+    tick: (v) => String(v),
+    format: (v) => `${v.toFixed(1)} ${isUS() ? "in" : "cm"}`,
+  },
+  weight: {
+    label: "Weight",
+    color: "#8944ab",
+    value: (e) => (isUS() ? e.weightKg / KG_PER_LB : e.weightKg),
+    tick: (v) => String(v),
+    format: (v) => `${v.toFixed(1)} ${isUS() ? "lb" : "kg"}`,
+  },
+};
+
+function onMetricClick(event) {
+  const metric = event.currentTarget.dataset.metric;
+  if (!METRICS[metric]) return;
+  settings.chartMetric = metric;
+  saveSettings();
+  renderChart();
+}
+
 function renderChart() {
   const W = 320;
   const H = 200;
+  const key = METRICS[settings.chartMetric] ? settings.chartMetric : "bf";
+  const metric = METRICS[key];
+  for (const btn of metricButtons) btn.setAttribute("aria-pressed", String(btn.dataset.metric === key));
+  chartSvg.setAttribute("aria-label", `${metric.label} trend`);
   chartSvg.replaceChildren();
 
   if (entries.length < 2) {
@@ -409,11 +457,12 @@ function renderChart() {
   }
 
   const pad = { l: 34, r: 10, t: 18, b: 22 };
-  const bf = entries.map((e) => e.bfComp);
-  const ma = weightedMA(bf);
+  const vals = entries.map(metric.value);
+  const ma = weightedMA(vals);
   const t = entries.map((e) => localTime(e.date));
+  const color = metric.color;
 
-  const all = [...bf, ...ma.filter((v) => v !== null)];
+  const all = [...vals, ...ma.filter((v) => v !== null)];
   let yMin = Math.floor(Math.min(...all) - 0.5);
   let yMax = Math.ceil(Math.max(...all) + 0.5);
   if (yMax - yMin < 2) yMax = yMin + 2;
@@ -428,7 +477,7 @@ function renderChart() {
   for (let v = yMin; v <= yMax; v += step) {
     chartSvg.appendChild(svg("line", { x1: pad.l, x2: W - pad.r, y1: y(v), y2: y(v), stroke: "#e5e5ea", "stroke-dasharray": "2 3" }));
     chartSvg.appendChild(
-      svg("text", { x: pad.l - 4, y: y(v) + 3, "text-anchor": "end", "font-size": 9, fill: "#6c6c70" }, `${v}%`)
+      svg("text", { x: pad.l - 4, y: y(v) + 3, "text-anchor": "end", "font-size": 9, fill: "#6c6c70" }, metric.tick(v))
     );
   }
 
@@ -442,104 +491,113 @@ function renderChart() {
   chartSvg.appendChild(xLabel(0, "start"));
   chartSvg.appendChild(xLabel(entries.length - 1, "end"));
 
-  const points = (vals) =>
-    vals
+  const points = (series) =>
+    series
       .map((v, i) => (v === null ? null : `${x(t[i]).toFixed(1)},${y(v).toFixed(1)}`))
       .filter(Boolean)
       .join(" ");
 
-  // Soft area fill under the BF% line.
+  // Soft area fill under the line.
   const defs = svg("defs", {});
-  const grad = svg("linearGradient", { id: "bfFill", x1: 0, y1: 0, x2: 0, y2: 1 });
-  grad.appendChild(svg("stop", { offset: "0%", "stop-color": "#007aff", "stop-opacity": 0.22 }));
-  grad.appendChild(svg("stop", { offset: "100%", "stop-color": "#007aff", "stop-opacity": 0 }));
+  const grad = svg("linearGradient", { id: "chartFill", x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.appendChild(svg("stop", { offset: "0%", "stop-color": color, "stop-opacity": 0.22 }));
+  grad.appendChild(svg("stop", { offset: "100%", "stop-color": color, "stop-opacity": 0 }));
   defs.appendChild(grad);
   chartSvg.appendChild(defs);
   const base = H - pad.b;
   chartSvg.appendChild(
     svg("polygon", {
-      points: `${x(t[0]).toFixed(1)},${base} ${points(bf)} ${x(t[t.length - 1]).toFixed(1)},${base}`,
-      fill: "url(#bfFill)",
+      points: `${x(t[0]).toFixed(1)},${base} ${points(vals)} ${x(t[t.length - 1]).toFixed(1)},${base}`,
+      fill: "url(#chartFill)",
     })
   );
 
   const line = { fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" };
-  chartSvg.appendChild(svg("polyline", { ...line, points: points(bf), stroke: "#007aff", "stroke-width": 2 }));
+  chartSvg.appendChild(svg("polyline", { ...line, points: points(vals), stroke: color, "stroke-width": 2 }));
   if (ma.some((v) => v !== null)) {
     chartSvg.appendChild(
       svg("polyline", { ...line, points: points(ma), stroke: "#ff9500", "stroke-width": 2, "stroke-dasharray": "4 4" })
     );
   }
-  bf.forEach((v, i) => chartSvg.appendChild(svg("circle", { cx: x(t[i]), cy: y(v), r: 2.5, fill: "#007aff" })));
+  vals.forEach((v, i) => chartSvg.appendChild(svg("circle", { cx: x(t[i]), cy: y(v), r: 2.5, fill: color })));
 
   // Latest point: larger dot + value label, on the side away from the average line.
-  const li = bf.length - 1;
-  const below = ma[li] !== null && ma[li] > bf[li];
-  chartSvg.appendChild(svg("circle", { cx: x(t[li]), cy: y(bf[li]), r: 4.5, fill: "#fff", stroke: "#007aff", "stroke-width": 2.5 }));
+  const li = vals.length - 1;
+  const below = ma[li] !== null && ma[li] > vals[li];
+  chartSvg.appendChild(svg("circle", { cx: x(t[li]), cy: y(vals[li]), r: 4.5, fill: "#fff", stroke: color, "stroke-width": 2.5 }));
   chartSvg.appendChild(
     svg(
       "text",
       {
         x: x(t[li]) - 7,
-        y: y(bf[li]) + (below ? 16 : -8),
+        y: y(vals[li]) + (below ? 16 : -8),
         "text-anchor": "end",
         "font-size": 10,
         "font-weight": 600,
-        fill: "#007aff",
+        fill: color,
         stroke: "#fff",
         "stroke-width": 3,
         "paint-order": "stroke",
       },
-      `${bf[li].toFixed(1)}%`
+      metric.format(vals[li])
     )
   );
 
   // legend
-  chartSvg.appendChild(svg("text", { x: W - pad.r - 52, y: 10, "font-size": 9, fill: "#007aff" }, "BF%"));
+  chartSvg.appendChild(svg("text", { x: W - pad.r - 30, y: 10, "text-anchor": "end", "font-size": 9, fill: color }, metric.label));
   chartSvg.appendChild(svg("text", { x: W - pad.r - 26, y: 10, "font-size": 9, fill: "#ff9500" }, "Avg"));
 }
 
-// export (§2.6)
+// backup (§2.6)
 function onExportCsv() {
   if (!entries.length) return;
-
-  const header = [
-    "date",
-    "sex",
-    "waist_cm",
-    "neck_cm",
-    "hip_cm",
-    "height_cm",
-    "weight_kg",
-    "age",
-    "bmi",
-    "bf_navy",
-    "bf_composite",
-  ];
-  const f = (v) => (v == null ? "" : v.toFixed(2));
-  const rows = entries.map((e) =>
-    [
-      e.date,
-      e.sex,
-      f(e.waistCm),
-      f(e.neckCm),
-      f(e.hipCm),
-      f(e.heightCm),
-      f(e.weightKg),
-      e.age,
-      f(e.bmi),
-      f(e.bfNavy),
-      f(e.bfComp),
-    ].join(",")
-  );
-
-  const csv = [header.join(","), ...rows].join("\n");
-  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  const url = URL.createObjectURL(new Blob([toCSV(entries)], { type: "text/csv" }));
   const a = document.createElement("a");
   a.href = url;
   a.download = `bf-tracker-${today()}.csv`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function onImportFile() {
+  const file = importInput.files?.[0];
+  if (!file) return;
+  const { entries: rows, skipped } = parseCSV(await file.text());
+  importInput.value = ""; // allow picking the same file again
+
+  const skippedNote = skipped ? `, ${skipped} skipped` : "";
+  const incoming = new Map(rows.map((r) => [r.date, r])); // later rows win
+  if (!incoming.size) {
+    backupStatus.textContent = `No valid entries found${skippedNote}.`;
+    return;
+  }
+
+  const byDate = new Map(entries.map((e) => [e.date, e]));
+  const replaced = [...incoming.keys()].filter((d) => byDate.has(d)).length;
+  if (replaced && !confirm(`Restore ${incoming.size} entries? ${replaced} existing date(s) will be replaced.`)) return;
+
+  const wasEmpty = entries.length === 0;
+  for (const [date, e] of incoming) byDate.set(date, e);
+  entries = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+  saveEntries();
+
+  // Fresh install: also restore the profile and weekly fields from the latest entry.
+  if (wasEmpty) {
+    const last = entries[entries.length - 1];
+    Object.assign(settings, { sex: last.sex, neckCm: last.neckCm, heightCm: last.heightCm, age: last.age });
+    if (last.hipCm) settings.hipCm = last.hipCm;
+    saveSettings();
+    writeSettingsFields(settings);
+    writeWeeklyFields(last.waistCm, last.weightKg);
+    applySexUI();
+  }
+
+  renderHistory();
+  renderChart();
+  update();
+  backupStatus.textContent = `Imported ${incoming.size} ${incoming.size === 1 ? "entry" : "entries"}${
+    replaced ? ` (${replaced} replaced)` : ""
+  }${skippedNote}.`;
 }
 
 // Dates are local calendar days ("YYYY-MM-DD"), never UTC.
