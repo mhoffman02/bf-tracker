@@ -71,7 +71,8 @@ Values persist and are reused for every entry. Each saved entry stores a snapsho
 
 ### 2.6 Backup (collapsed)
 
-- **Download CSV** of all entries, generated client‑side.
+- **Export CSV** of all entries, generated client‑side. Saves pending typing first. On touch devices it opens the Share sheet (Save to Files, Numbers, Mail…) so a Home Screen app never navigates away; elsewhere it downloads `body-comp-YYYY-MM-DD.csv`.
+- If iOS reloads/restores the page with empty fields, they're refilled from saved data on `pageshow` (date → today).
 - Columns: `date, sex, waist_cm, neck_cm, hip_cm, height_cm, weight_kg, age, bmi, bf_navy, bf_composite`.
 - **Restore from CSV**: reads that format back (columns matched by name; `YYYY-MM-DD` or US `M/D/YYYY` dates). BMI/BF% are recomputed; invalid rows are skipped. Merges by date — an imported date replaces the existing one (confirm first). If the newest entry overall comes from the file (fresh install, or a backup newer than local data), the profile (sex, neck, hip, height, age) and weekly fields are restored from it; otherwise the current profile is kept. Shows “Imported N entries (R replaced), S skipped.”
 

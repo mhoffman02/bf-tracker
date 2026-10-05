@@ -99,7 +99,7 @@ function init() {
   });
   window.addEventListener("pagehide", flushSave);
   window.addEventListener("pageshow", () => {
-    ensureDate();
+    refillEmptyFields();
     update();
   });
 }
@@ -305,6 +305,19 @@ function onWeeklyInput() {
 // without a date nothing can be saved, so fall back to today.
 function ensureDate() {
   if (!dateInput.value) dateInput.value = today();
+}
+
+// iOS may reload or restore the page with emptied fields (e.g. around the Files or
+// Share viewer). Refill only empty fields, from saved data.
+function refillEmptyFields() {
+  ensureDate();
+  const src = entries.find((e) => e.date === dateInput.value) ?? entries[entries.length - 1] ?? DEFAULTS[settings.sex];
+  if (!waistInput.value) put(waistInput, lenOut(src.waistCm), src.waistCm);
+  if (!weightInput.value) put(weightInput, massOut(src.weightKg), src.weightKg);
+  if (!neckInput.value) put(neckInput, lenOut(settings.neckCm), settings.neckCm);
+  if (settings.sex === "female" && !hipInput.value) put(hipInput, lenOut(settings.hipCm), settings.hipCm);
+  if (isUS() ? !heightFtInput.value : !heightCmInput.value) writeHeight(settings.heightCm);
+  if (!ageInput.value) ageInput.value = show(settings.age);
 }
 
 function onDateChange() {
@@ -570,11 +583,23 @@ function renderChart() {
 
 // backup (§2.6)
 function onExportCsv() {
+  flushSave(); // iOS may reload the app around the file viewer; save typing first
   if (!entries.length) return;
-  const url = URL.createObjectURL(new Blob([toCSV(entries)], { type: "text/csv" }));
+  const name = `body-comp-${today()}.csv`;
+  const csv = toCSV(entries);
+
+  // On touch devices use the Share sheet (Save to Files, Numbers, Mail…): a download
+  // link opens a full-screen viewer in a Home Screen app and can reload it.
+  const file = new File([csv], name, { type: "text/csv" });
+  if (navigator.maxTouchPoints > 0 && navigator.canShare?.({ files: [file] })) {
+    navigator.share({ files: [file], title: "Body Comp backup" }).catch(() => {}); // dismissed
+    return;
+  }
+
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   const a = document.createElement("a");
   a.href = url;
-  a.download = `body-comp-${today()}.csv`;
+  a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

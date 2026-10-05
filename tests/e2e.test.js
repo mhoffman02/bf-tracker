@@ -293,3 +293,58 @@ test("restoring yesterday's backup today: keeps today's date, saves nothing new"
   assert.match(app.$("bfDelta").textContent, /^No change since /);
   app.close();
 });
+
+const stubDownload = (app) => {
+  const orig = URL.createObjectURL;
+  let blob = null;
+  URL.createObjectURL = (b) => ((blob = b), "blob:test");
+  app.window.HTMLAnchorElement.prototype.click = () => {};
+  return { blob: () => blob, restore: () => (URL.createObjectURL = orig) };
+};
+
+test("export saves pending typing first (nothing lost if iOS reloads the app)", async () => {
+  const app = await loadApp();
+  const dl = stubDownload(app);
+  app.type("waistInput", 37); // debounce still pending
+  app.$("exportCsvBtn").dispatchEvent(new app.window.Event("click"));
+  dl.restore();
+
+  assert.equal(app.entries().length, 1, "entry saved before export");
+  assert.match(await dl.blob().text(), /\n\d{4}-\d{2}-\d{2},male,93\.98,/);
+  app.close();
+});
+
+test("export uses the Share sheet when available (stays in the app on iOS)", async () => {
+  const app = await loadApp({ "bf.entries": JSON.stringify([prior("2026-09-27", 26)]) });
+  const dl = stubDownload(app);
+  const shared = [];
+  Object.assign(app.window.navigator, {
+    canShare: (data) => Array.isArray(data?.files),
+    share: async (data) => void shared.push(data),
+  });
+  Object.defineProperty(app.window.navigator, "maxTouchPoints", { value: 5 }); // phone
+  app.$("exportCsvBtn").dispatchEvent(new app.window.Event("click"));
+  dl.restore();
+
+  assert.equal(shared.length, 1);
+  assert.match(shared[0].files[0].name, /^body-comp-\d{4}-\d{2}-\d{2}\.csv$/);
+  assert.equal(dl.blob(), null, "no download link used");
+  app.close();
+});
+
+test("returning to the app refills any emptied fields from saved data", async () => {
+  const app = await loadApp({ "bf.entries": JSON.stringify([prior("2026-09-27", 26)]) });
+  for (const id of ["dateInput", "waistInput", "weightInput", "neckInput", "heightFtInput", "heightInInput", "ageInput"]) {
+    app.$(id).value = "";
+  }
+  app.window.dispatchEvent(new app.window.Event("pageshow"));
+
+  assert.ok(app.$("dateInput").value);
+  assert.equal(app.$("waistInput").value, "40");
+  assert.equal(app.$("weightInput").value, "200");
+  assert.equal(app.$("neckInput").value, "15.5");
+  assert.equal(app.$("heightFtInput").value, "5");
+  assert.equal(app.$("ageInput").value, "40");
+  assert.match(app.bf(), /%$/);
+  app.close();
+});

@@ -40,7 +40,7 @@ On each release, bump `VERSION` in `service-worker.js` so installed clients pick
 ## Install on iPhone/iPad
 
 Open the live URL in Safari → Share → **Add to Home Screen**.
-Note: home-screen app storage is separate from Safari-tab storage, and devices don't sync. Use **Backup → Download CSV** to save a copy and **Restore from CSV** to bring it back (or onto another device).
+Note: home-screen app storage is separate from Safari-tab storage, and devices don't sync. Use **Backup → Export CSV** (Share sheet → Save to Files) to save a copy and **Restore from CSV** to bring it back (or onto another device).
 
 **Install it — don't just bookmark it.** Safari may delete a website's stored data after 7 days of Safari use without visiting the site. Apps added to the Home Screen are exempt, so your entries are kept.
 
