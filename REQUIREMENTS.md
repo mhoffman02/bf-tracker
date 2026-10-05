@@ -153,6 +153,7 @@ Applied identically for both sexes (assumption — see §11).
 - Apple meta tags: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-touch-icon` (180×180).
 - **Offline required:** service worker precaches all app files (cache‑first, versioned cache name, old caches removed on activate).
 - Fast startup; no runtime network requests; no external fonts, scripts, or CDNs.
+- **Privacy:** no data collected or shared (App Store label “Data Not Collected”). Footer notice in the app; Privacy section in README. A test fails if the app makes any network request while in use.
 
 ## 7. App icon
 

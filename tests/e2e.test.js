@@ -117,3 +117,32 @@ test("header shows change since previous entry, range pill, local-format dates",
   assert.equal(firstCell, localFmt("2026-09-27", { dateStyle: "medium" }));
   app.close();
 });
+
+test("privacy: notice shown; using the app makes no network requests", async () => {
+  const calls = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (...args) => {
+    calls.push(String(args[0]));
+    throw new Error("network");
+  };
+  try {
+    const app = await loadApp();
+    const w = app.window;
+    w.fetch = globalThis.fetch;
+    w.XMLHttpRequest.prototype.open = function (_m, url) {
+      calls.push(String(url));
+    };
+    w.navigator.sendBeacon = (url) => (calls.push(String(url)), true);
+
+    assert.match(app.$("privacyNote").textContent, /Data Not Collected/);
+    app.type("waistInput", 37);
+    app.select("unitToggle", "metric");
+    app.select("sexInput", "female");
+    app.leave();
+    app.$("exportCsvBtn").dispatchEvent(new w.Event("click"));
+    assert.deepEqual(calls, []);
+    app.close();
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});

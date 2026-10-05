@@ -302,6 +302,31 @@ button:active {
   fill: var(--muted);
 }
 
+/* Privacy footer */
+.privacy {
+  margin: 1.5rem 1rem 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.privacy strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.privacy-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 0 auto 0.3rem;
+  fill: var(--muted);
+}
+
 /* History */
 table {
   width: 100%;

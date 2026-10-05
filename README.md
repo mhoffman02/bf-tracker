@@ -5,6 +5,14 @@ See [REQUIREMENTS.md](REQUIREMENTS.md).
 
 Live: https://mhoffman02.github.io/bf-tracker/
 
+## Privacy
+
+**Data Not Collected.** BF Tracker has no account, no analytics, no ads and no tracking. Your measurements are stored only in your browser on this device (`localStorage`) and are never sent to a server. The app makes no network requests while in use (enforced by a test); after the first visit it runs fully offline.
+
+- **Data shared with third parties:** none.
+- **Hosting:** the app's files are served by GitHub Pages, which, like any web host, may log standard request data (e.g. IP address) when the files are downloaded. No measurements are included.
+- **Your control:** export a CSV backup anytime; deleting the app or clearing website data permanently deletes your entries.
+
 ## Dev
 
 ```sh
