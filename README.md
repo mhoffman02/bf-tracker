@@ -33,3 +33,7 @@ On each release, bump `VERSION` in `service-worker.js` so installed clients pick
 
 Open the live URL in Safari → Share → **Add to Home Screen**.
 Note: home-screen app storage is separate from Safari-tab storage, and devices don't sync — use CSV export as backup.
+
+## License
+
+[MIT](LICENSE)

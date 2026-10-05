@@ -12,6 +12,7 @@
     "test:watch": "node --test --watch tests/*.test.js",
     "serve": "python3 -m http.server 8080"
   },
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.6.4",
     "jsdom": "^30.1.2"
