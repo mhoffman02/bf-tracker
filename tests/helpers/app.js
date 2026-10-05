@@ -1,4 +1,8 @@
-// Loads index.html + app.js into jsdom so tests can drive the real UI.
+/**
+ * @file Loads index.html + app.js into jsdom so tests can drive the real UI.
+ */
+"use strict";
+
 import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
 

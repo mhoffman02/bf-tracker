@@ -1,3 +1,8 @@
+/**
+ * @file Service worker: precaches the app shell and serves it cache-first for offline use.
+ */
+"use strict";
+
 // Bump on each release so installed clients pick up new files.
 const VERSION = "v9";
 const CACHE = `bf-tracker-${VERSION}`;

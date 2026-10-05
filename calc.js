@@ -1,4 +1,7 @@
-// Pure formulas and conversions (REQUIREMENTS §3–4). All inputs metric.
+/**
+ * @file Pure formulas and conversions (REQUIREMENTS §3–4). All inputs metric.
+ */
+"use strict";
 
 export const CM_PER_IN = 2.54;
 export const KG_PER_LB = 0.45359237;
@@ -33,7 +36,14 @@ export function compositeBF(bfNavy, bmiValue, age) {
 
 const pos = (v) => Number.isFinite(v) && v > 0;
 
-// Returns { bfNavy, bmi, bfComp, warning } or null when invalid (§3.4).
+/**
+ * Validate a measurement and derive body-fat figures.
+ * @param {{sex: string, waistCm: number, neckCm: number, hipCm: ?number, heightCm: number, weightKg: number, age: number}} m
+ *   hipCm is required only for female.
+ * @returns {?{bfNavy: number, bmi: number, bfComp: number, warning: string}}
+ *   null when any input is non-positive/non-finite or the Navy log argument would be <= 0 (§3.4);
+ *   `warning` is non-empty for implausible but computable values.
+ */
 export function compute(m) {
   const female = m.sex === "female";
   const required = [m.waistCm, m.neckCm, m.heightCm, m.weightKg, m.age];

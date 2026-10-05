@@ -1,3 +1,6 @@
+/** @file Unit tests for calc.js. */
+"use strict";
+
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CM_PER_IN, KG_PER_LB, navyBF, bmi, compositeBF, compute, weightedMA, bfCategory, massSplit } from "../calc.js";

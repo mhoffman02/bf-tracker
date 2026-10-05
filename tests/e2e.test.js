@@ -1,3 +1,6 @@
+/** @file End-to-end tests driving the real UI (app.js + index.html) in jsdom. */
+"use strict";
+
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { setTimeout as sleep } from "node:timers/promises";

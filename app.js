@@ -1,3 +1,10 @@
+/**
+ * @file Body Comp UI: wires index.html to storage, calculations, history, chart and CSV backup.
+ * State lives in module-level `entries` / `settings`, always stored metric; unit conversion
+ * happens only at the form boundary. Runs on import (calls init()).
+ */
+"use strict";
+
 import { CM_PER_IN, KG_PER_LB, compute, weightedMA, bfCategory, massSplit } from "./calc.js";
 import { toCSV, parseCSV } from "./csv.js";
 
@@ -188,16 +195,22 @@ const num = (el) => (el.value === "" ? NaN : Number(el.value));
 // drift; used until the user edits the field.
 const exact = new WeakMap();
 
+/** Set a field's display text and remember the exact metric value behind it. */
 function put(el, text, metric) {
   el.value = text;
   exact.set(el, { text, metric });
 }
 
+/**
+ * Metric value for a field: the exact value stored by put() if the text is untouched,
+ * otherwise the user's typed value converted via `fromDisplay`.
+ */
 function take(el, fromDisplay) {
   const e = exact.get(el);
   return e && e.text === el.value ? e.metric : fromDisplay(num(el));
 }
 
+/** Height in cm from whichever height inputs are active (cm, or ft + in in US mode). */
 function readHeightCm() {
   if (!isUS()) return take(heightCmInput, Number);
   const ft = exact.get(heightFtInput);
@@ -264,6 +277,7 @@ function readMeasurement() {
   };
 }
 
+/** Recompute and redraw the result panel (BF%, warning, fat/lean split, category, delta) from the form. */
 function update() {
   const m = readMeasurement();
   const result = compute(m);
@@ -356,6 +370,7 @@ function onSexChange() {
   scheduleSave();
 }
 
+/** Switch US/metric: capture exact values in the old units first so toggling back and forth doesn't drift. */
 function onUnitChange() {
   // Read with the old units before switching; hip is read even while hidden.
   const m = { ...readMeasurement(), hipCm: take(hipInput, lenIn) };
@@ -381,6 +396,7 @@ function flushSave() {
   saveCurrent();
 }
 
+/** Upsert the form's measurement as the entry for its date; no-op if invalid. */
 function saveCurrent() {
   saveTimer = null;
   const m = readMeasurement();
@@ -473,6 +489,11 @@ function onMetricClick(event) {
   renderChart();
 }
 
+/**
+ * Draw the trend chart for the selected metric into the inline SVG (320x200 viewBox):
+ * raw line with area fill, 1:2:3 weighted average (dashed), and a labelled latest point.
+ * Times use local midnight so spacing is by calendar date, not entry count.
+ */
 function renderChart() {
   const W = 320;
   const H = 200;
@@ -604,6 +625,11 @@ function onExportCsv() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/**
+ * Merge a CSV backup into entries (file rows replace same-date entries; confirms first if
+ * any would be replaced). Profile/weekly fields are adopted only when the file supplies
+ * the newest entry overall, so restoring an old backup doesn't clobber current values.
+ */
 async function onImportFile() {
   const file = importInput.files?.[0];
   if (!file) return;

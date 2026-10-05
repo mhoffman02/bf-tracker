@@ -1,3 +1,6 @@
+/** @file Unit tests for csv.js. */
+"use strict";
+
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CM_PER_IN, KG_PER_LB, compute } from "../calc.js";

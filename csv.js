@@ -1,4 +1,8 @@
-// CSV backup format (REQUIREMENTS §2.6). Pure functions; no DOM.
+/**
+ * @file CSV backup format (REQUIREMENTS §2.6). Pure functions; no DOM.
+ */
+"use strict";
+
 import { compute } from "./calc.js";
 
 export const CSV_COLUMNS = [
@@ -35,8 +39,13 @@ export function toCSV(entries) {
   return [CSV_COLUMNS.join(","), ...rows].join("\n");
 }
 
-// Columns are matched by header name, so order doesn't matter. Derived values
-// (bmi, bf_*) are recomputed from the measurements; invalid rows are skipped.
+/**
+ * Parse a backup CSV into entries.
+ * Columns are matched by header name, so order doesn't matter. Derived values
+ * (bmi, bf_*) are recomputed from the measurements; invalid rows are skipped.
+ * @param {string} text
+ * @returns {{entries: object[], skipped: number}}
+ */
 export function parseCSV(text) {
   const lines = text
     .replace(/^﻿/, "")
